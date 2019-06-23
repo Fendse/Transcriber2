@@ -1,7 +1,9 @@
 /* global angular */
 /* global debugChunkLists */
 
-function Chunk(reading) {
+
+// <editor-fold desc="Chunk 'class' (commented out)">
+/* function Chunk(reading) {
     this.uuid = uuid();
     
     this.concat = function(otherChunk) {
@@ -63,40 +65,28 @@ function Chunk(reading) {
         // TODO: Branches? Maybe something else interesting?
     }
     
-}
+}*/
+// </editor-fold>
 
-function TranscriberController($interval, $scope, $window) {
-    var debug = !$window.alt1;
-    if (debug) {
+function TranscriberController($interval, $scope, alt1) {
+    
+    if (!alt1) {
         console.log('Alt1 does not appear to be running, switching to debug mode');
         
         // Initialise chunk list with a debug list
         $scope.chunk = debugChunkLists.testLinear;
-        
-        // Create a dummy alt1 object.
-        $window.alt1 = {
-            bindfullrs: function (){},
-            mixcolor: function (r, g, b) {},
-            events: {
-                alt1pressed: []
-            },
-            permissionsOverlay: true,
-            group: undefined,
-            overLayClearGroup: function(g) {console.log('Group', g, 'cleared');},
-            overLaySetGroup: function(g) {console.log('Using group ', g); group = g;},
-            overLayRect: function(color, x, y, w, h, time, unknown) {console.log('Drew a rectagle');}
-        };
-        
+   
+        // Most of the usual logic isn't relevant here, so we return early.
         return;
     } else {
         $scope.reader = new DialogFullReader();
 
         $scope.chunk = [];
         $scope.lastRead = null;
-        $scope.currentChonk = new Chunk();
+        // $scope.currentChonk = new Chunk();
     }
     $scope.updateModel = function() {
-        var img = $window.a1lib.bindfullrs();
+        var img = alt1.bindfullrs();
         var foundBox = $scope.reader.find(img);
         
         if (!foundBox) {
@@ -138,7 +128,22 @@ function TranscriberController($interval, $scope, $window) {
 angular.module('rs-wiki-transcriber', [])
     //.factory('transcription', ['$interval', '$scope', '$window', TranscriptionServiceFactory])
     .factory('alt1', ['$window', function($window){
-        if ($window.alt1) return $window.alt1;
-        else return null;
+        if (!$window.alt1) {
+            // Create a dummy alt1 object to access debug functionality.
+            $window.alt1 = {
+                bindfullrs: function() { return null; },
+                mixcolor: function (r, g, b) {},
+                events: {
+                    alt1pressed: []
+                },
+                permissionsOverlay: true,
+                group: undefined,
+                overLayClearGroup: function(g) {console.log('Group', g, 'cleared');},
+                overLaySetGroup: function(g) {console.log('Using group ', g); group = g;},
+                overLayRect: function(color, x, y, w, h, time, unknown) {console.log('Drew a rectagle');}
+            };
+        }
+        
+        return $window.alt1;
     }])
-    .controller('transcriber', ['$interval', '$scope', '$window', TranscriberController]);
+    .controller('transcriber', ['$interval', '$scope', 'alt1', TranscriberController]);
