@@ -1,0 +1,59 @@
+/*.pretty .chonk {
+    margin: 20px;
+    border-style: solid;
+    border-radius: 15px;
+    padding-left: 4px;
+}*/
+
+.pretty .title {
+    font-weight: bold;
+}
+
+.pretty .text {
+    outline-style: solid;
+    outline-width: 1px;
+    outline-color: transparent;
+}
+
+.pretty .text:hover {
+    outline-color: black;
+}
+
+.pretty > * {
+    background-color: lightgray;
+    border-left-style: solid;
+    border-left-color: black;
+    border-left-width: 1px;
+}
+.pretty .chunk-list, .pretty .option {
+    /*border-left-style: solid;
+    border-left-color: transparent;
+    border-left-width: 1px;
+    */
+    list-style-type: none;
+    padding-left: 1em;
+    margin-top: 0;
+    margin-left: 0;
+    margin-bottom: 0.3em;
+}
+
+.pretty .chunk-list:hover, .pretty .branch-item:hover {
+    list-style-type: circle;
+    //border-left-color: black;
+}
+
+.pretty .option:hover {
+    list-style-type: decimal;
+}
+
+.pretty .branch-condition {
+    font-style: italic;
+}
+
+.pretty .options-list {
+    margin-top: 0.4em;
+}
+
+.pretty .question {
+    font-weight: bold;
+}

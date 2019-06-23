@@ -1,0 +1,13 @@
+.wikicode {
+    font-family: monospace, monospace;
+}
+
+.wikicode .text {
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+}
+
+.wikicode .text:hover {
+    border-color: black;
+}
