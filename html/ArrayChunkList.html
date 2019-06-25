@@ -1,7 +1,7 @@
 <ul class="chunk-list">
     <li ng-repeat="c in chunk" class="chonk">
         <div ng-if="c.type === 'speech'">
-            <span editable-model contenteditable required
+            <span editable-model contenteditable
                   ng-model="c.title"
                   editable-model-filters="formatSpeaker : showAsCode"
                   class="title">
@@ -9,7 +9,7 @@
             </span>
             <span class="text"
                   ng-repeat="item in c"
-                  editable-model contenteditable required
+                  editable-model contenteditable
                   ng-model="item.text"
                   editable-model-filters="prependSpace | formatText : showAsCode">
                 Text
@@ -17,7 +17,7 @@
         </div>
         <div ng-if="c.type === 'choice'">
             <span class="question"
-                  editable-model contenteditable required
+                  editable-model contenteditable
                   ng-model="c.title">
                 Question
             </span>
@@ -25,7 +25,7 @@
                 <li class="option"
                     ng-repeat="chunk in c">
                     <span class="option-name"
-                          editable-model contenteditable required
+                          editable-model contenteditable
                           ng-model="chunk.text"
                           editable-model-filters="formatOptionName : showAsCode">
                         Option {{$index}}
@@ -40,7 +40,7 @@
                 <li class="condition"
                     ng-repeat="option in c.options">
                     <span class="branch-condition"
-                          editable-model contenteditable required
+                          editable-model contenteditable
                           ng-model="option.text"
                           editable-model-filters="formatBranchCondition : showAsCode">
                         Condition
@@ -57,7 +57,7 @@
         <div ng-if="c.type === 'message'">
             <span class="text"
                   ng-repeat="item in c"
-                  editable-model contenteditable required
+                  editable-model contenteditable
                   ng-model="item.text"
                   editable-model-filters="prependSpace | formatMessageText : showAsCode">
                 Message text

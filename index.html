@@ -2,25 +2,28 @@
     <meta charset="UTF-8">
     <title>RuneScape Wiki Transcriber</title>
     
-    <script type="text/javascript" src="js/debugChunks.js"></script>
-    
-    
-    
-    <link rel="stylesheet" type="text/css" href="https://runeapps.org/nis/nis.css" />
-    <link rel="stylesheet" type="text/css" href="https://runeapps.org/runeappslib.css" />
-    <script type="text/javascript" src="https://runeapps.org//runeappslib.js"></script>
-    <script type="text/javascript" src="https://runeapps.org//imagedetect.js"></script>
-    <script type="text/javascript" src="https://runeapps.org//alt1lib.js"></script>
-    <script type="text/javascript" src="https://runeapps.org//imagelibs/ocr.js"></script>
-    <script type="text/javascript" src="https://runeapps.org//imagelibs/dialogfull.js"></script>
-    <script type="text/javascript" src="https://runeapps.org//imagelibs/lorebook.js"></script>
-    <script type="text/javascript" src="js/libs/angular-1.7.8.js"></script>
     <script type="text/javascript" src="js/libs/uuid-random/uuid-random.min.js"></script>
+    <script type="text/javascript" src="js/LinkedListChunks.js"></script>
+    
+    
+    
+    <link rel="stylesheet" type="text/css" href="css/runeapps/nis/nis.css" />
+    <link rel="stylesheet" type="text/css" href="css/runeapps/runeappslib.css" />
+    <script type="text/javascript" src="js/libs/runeapps/runeappslib.js"></script>
+    <script type="text/javascript" src="js/libs/runeapps/imagedetect.js"></script>
+    <script type="text/javascript" src="js/libs/runeapps/alt1lib.js"></script>
+    <script type="text/javascript" src="js/libs/runeapps/imagelibs/ocr.js"></script>
+    <script type="text/javascript" src="js/libs/runeapps/imagelibs/dialogfull.js"></script>
+    <script type="text/javascript" src="js/libs/runeapps/imagelibs/lorebook.js"></script>
+    <script type="text/javascript" src="js/libs/angular.js/angular-1.7.8.js"></script>
+    
 
-    <script type="text/javascript" src="js/chunks.js"></script>
+    
     <script type="text/javascript" src="js/transcriber3.js"></script>
     <script type="text/javascript" src="js/filters.js"></script>
     <script type="text/javascript" src="js/editableModelDirective.js"></script>
+    <script type="text/javascript" src="js/chunkListDirective.js"></script>
+    <script type="text/javascript" src="js/LinkedListChunks.js"></script>
     
     <link rel="stylesheet" type="text/css" href="css/pretty.css" />
     <link rel="stylesheet" type="text/css" href="css/rs3-en.css" />
@@ -28,19 +31,20 @@
     <link rel="icon" href="favicon2.ico" type="image/x-icon" />
 </head>
 <body ng-app="rs-wiki-transcriber" ng-controller="transcriber">
+    <script type="text/javascript" src="js/debugChunks.js"></script>
     <input type="checkbox" ng-model="showAsCode" />
     
     
     <!-- Menu -->
     <div ng-class="showAsCode ? 'wikicode': 'pretty'">
-        <ng-include src="'chunklist.html'"></ng-include>
+        <ul class="chunk-list">
+            <chunk-list chunk="chunk"></chunk-list>
+        </ul>
     </div>
     
 </body>
 <!--
 	TODO:
-	Figure out recursive chonks (look into ng-include directive)
-	Add more classes and formatting
 	Add menu
 	Directives for merging
 	Editable conditions (use contenteditable="true")

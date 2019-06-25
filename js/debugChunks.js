@@ -1,5 +1,5 @@
-var debugChunkLists = {};
-{
+// <editor-fold defaultstate="collapsed" desc="Old array-style chunks (disabled)">
+a = function () {
     // <editor-fold desc="testLinear">
     var cl1 = [
         { text: 'Oh, there\'s someone here.' },
@@ -97,4 +97,6 @@ var debugChunkLists = {};
         }
     ];*/
     //</editor-fold>
-}
+}//()
+;
+// </editor-fold>

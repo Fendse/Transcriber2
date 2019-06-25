@@ -54,6 +54,7 @@ function ChunkBuilder(type) {
         this.option = function(text) {
             var opt = [];
             opt.text = text;
+            opt.originalText = text;
             this.chunk.push(opt);
             return this;
         };
@@ -66,7 +67,7 @@ function ChunkBuilder(type) {
     
     if (type === 'speech' || type === 'message' || type === 'action') {
         this.text = function(text) {
-            this.chunk.push(text);
+            this.chunk.push({text: text, originalText: text});
             return this;
         };
     }

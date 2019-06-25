@@ -1,0 +1,66 @@
+<li class="chonk">
+    {{chunk}}
+    <div ng-if="chunk.type === 'speech'">
+        <span editable-model contenteditable
+              ng-model="chunk.title"
+              editable-model-filters="formatSpeaker : showAsCode"
+              class="title">
+            Speaker
+        </span>
+        <span class="text"
+              ng-repeat="item in chunk.text"
+              editable-model contenteditable
+              ng-model="item.text"
+              editable-model-filters="prependSpace | formatText : showAsCode">
+            Text
+        </span>
+    </div>
+    <div ng-if="chunk.type === 'choice'">
+            <span class="question"
+                  editable-model contenteditable
+                  ng-model="chunk.title">
+                Question
+            </span>
+            <ul class="options-list">
+                <li class="option"
+                    ng-repeat="option in chunk.options">
+                    <span class="option-name"
+                          editable-model contenteditable
+                          ng-model="option.text"
+                          editable-model-filters="formatOptionName : showAsCode">
+                        Option {{$index + 1}}
+                    </span>
+                    <br />
+                    <ul class="chunk-list">
+                        <chunk-list chunk="{{option.firstChunk}}" ng-if="option.firstChunk"></chunk-list>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div ng-if="chunk.type === 'branch'">
+            <ul>
+                <li class="condition"
+                    ng-repeat="option in chunk.options">
+                    <span class="branch-condition"
+                          editable-model contenteditable
+                          ng-model="option.text"
+                          editable-model-filters="formatBranchCondition : showAsCode">
+                        Condition
+                    </span>
+                    <ul class="chunk-list">
+                        <chunk-list chunk="{{option.firstChunk}}" ng-if="option.firstChunk"></chunk-list>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div ng-if="chunk.type === 'message'">
+            <span class="text"
+                  ng-repeat="item in c"
+                  editable-model contenteditable
+                  ng-model="item.text"
+                  editable-model-filters="prependSpace | formatMessageText : showAsCode">
+                Message text
+            </span>
+        </div>
+</li>
+<chunk-list chunk="chunk" ng-if="chunk.next"></chunk-list>

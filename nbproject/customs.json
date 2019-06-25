@@ -1,10 +1,17 @@
 {
     "elements": {
+        "chunk-list": {
+            "attributes": {
+                "chunk": {}
+            }
+        },
         "ng-include": {
             "attributes": {
                 "src": {}
             }
         }
     },
-    "attributes": {}
+    "attributes": {
+        "ng-if": {}
+    }
 }
