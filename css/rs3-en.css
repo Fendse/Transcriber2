@@ -11,3 +11,7 @@
 .wikicode .text:hover {
     border-color: black;
 }
+
+.wikicode .identifier {
+    display: none;
+}

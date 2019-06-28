@@ -1,10 +1,10 @@
 function LinkedChunk(type) {
     switch (type) {
+        case 'reference':
         case 'speech':
         case 'choice':
         case 'message':
         case 'branch':
-        case 'reference':
         case 'action':
         case undefined:
             break;
@@ -48,6 +48,7 @@ function LinkedChunk(type) {
                 firstChunk: chunk || null
             };
             this.options.push(opt);
+            console.log('Added option', text, 'leading into chunk', chunk)
             return this;
         };
         
@@ -75,6 +76,15 @@ function LinkedChunk(type) {
         this.text = [];
         this.addText = function(text) {
             this.text.push({text: text, originalText: text});
+            return this;
+        };
+    }
+    
+    if (type === 'reference') {
+        this.target = null;
+        this.setTarget = function(targetChunk) {
+            this.target = targetChunk;
+            // Maybe store just the ID?
             return this;
         };
     }
@@ -123,6 +133,8 @@ function LinkedChunk(type) {
                 case 'prev':
                     result.prev = this.prev && this.prev.id;
                     break;
+                case 'target':
+                    result.target = this.target && this.target.id;
                 default:
                     result[key] = this[key];
                     break;

@@ -1,72 +1,4 @@
 /* global angular */
-/* global debugChunkLists */
-
-
-// <editor-fold defaultstate="collapsed" desc="Very old Chunk 'class' (commented out) {...}">
-/* function Chunk(reading) {
-    this.uuid = uuid();
-    
-    this.concat = function(otherChunk) {
-        if (this.type && this.type !== otherChunk.type) throw new Error('Can\'t concatenate chunks with differing types ' + this.type + ' and ' + otherChunk.type);
-        if (this.title !== otherChunk.title) throw new Error('Can\t concatenate chunks with differing titles ' + this.title + ' and ' + otherChunk.title);
-        if (this.type === 'question') throw new Error('Can\'t concatenate question-type chunks');
-        if (this.type === 'branch') throw new Error('Concatenating branch-type chunks not implemented');
-        
-        var result = {
-            type: this.type,
-            title: this.title,
-            items: this.items + otherChunk.items
-        };
-    };
-    
-    this.canResultFromRead = function(reading, index) {
-        if (reading === undefined) return false;
-        if (this.title !== reading.title) return false;
-        if (this.options) {
-            
-        }
-    };
-    
-    if (reading) {
-        if (reading.text) {
-            this.items = [{
-                    text: reading.text
-            }];
-        }
-        if (reading.title) {
-            this.title = reading.title;
-        }
-        if (reading.opts) {
-            this.options = [];
-            for (var i = 0; i < reading.opts.length; ++i) {
-                this.options.push({
-                    text: reading.opts[i].str,
-                    chunks: [new Chunk()]
-                });
-            }
-        }
-        
-        if (this.items) {
-            if (this.title) {
-                this.type = 'speech';
-            } else {
-                this.type = 'message';
-            }
-        } else if (this.options) {
-            if (this.title) {
-                this.type = 'question';
-            } else {
-                this.type = 'branch';
-            }
-        } else {
-            throw new Error('Can\'t figure out chunk type, as neither text nor options were present');
-        }
-    } else {
-        // TODO: Branches? Maybe something else interesting?
-    }
-    
-}*/
-// </editor-fold>
 
 
 function debugChunks () {
@@ -107,6 +39,17 @@ function debugChunks () {
                 )
             )
         );
+
+    var referenceTestChunk = new LinkedChunk('speech')
+        .setTitle('Grumpy stranger')
+        .addText('None of your business!')
+        .addText('I don\'t know you, stop bothering me!');
+    debugChunkList.testReferences = new LinkedChunk('choice')
+        .setTitle('What would you like to say?')
+        .addOption('Who are you?', referenceTestChunk)
+        .addOption('What are you doing here?', new LinkedChunk('reference')
+            .setTarget(referenceTestChunk)
+        );
     
     return debugChunkList;
 }
@@ -118,23 +61,30 @@ function TranscriberController($interval, $scope, alt1) {
         console.log('Alt1 does not appear to be running, switching to debug mode');
         
         // Initialise chunk list with a debug list
-        console.log(debugChunks());
-        console.log(debugChunks().testLinear);
-        $scope.chunk = debugChunks().testLinear;
-   
-        // Most of the usual logic isn't relevant here, so we return early.
-        return;
+        $scope.rootChunk = $scope.chunk = debugChunks().testReferences;
+        
+        $scope.reader = {
+            read: function() {
+                return null; // TODO better fake
+            },
+            
+            find: function() {
+                return false;
+            }
+        };
     } else {
+        $scope.rootChunk = $scope.chunk = null;
+        
         $scope.reader = new DialogFullReader();
-
-        $scope.chunk = [];
-        $scope.childIndex = -1;
-        $scope.itemIndex = null;
-        $scope.lastRead = null;
-        // $scope.currentChonk = new Chunk();
     }
+    $scope.childIndex = -1;
+    $scope.itemIndex = null;
+    $scope.lastRead = null;
+
     
     function equalReads (read1, read2) {
+        if (!read1) return read1 === read2;
+        if (!read2) return false;
         if (read1.title !== read2.title) return false;
         if (read1.text !== read2.text) return false;
         if (!read1.opts) return !read2.opts;
@@ -150,8 +100,8 @@ function TranscriberController($interval, $scope, alt1) {
     
     $scope.updateModel = function() {
         if (!$scope.reader.find()) {
-            // Do we know the box has vanished, or is it possible to just fail to find it?
-            // Do we {{qact}} when the box vanishes? Do we set lastRead to null?
+            // Assume the box is present and unchanged, we just failed to find it
+            // It's possible that the box vanished (in which case we might want to {{qact}}
             // TODO
             return;
         }
@@ -163,10 +113,16 @@ function TranscriberController($interval, $scope, alt1) {
             return;
         }
         
+        if ($scope.waitingForChoice) {
+            // TODO: Implement
+            console.log('Waiting for user to select an option.');
+            return;
+        }
+        
         if (equalReads(read, $scope.lastRead)) return;
         $scope.lastRead = read;
         
-        if ($scope.chunk[$scope.childIndex + 1]) {
+        if ($scope.chunk && $scope.chunk[$scope.childIndex + 1]) {
             /* 
                TODO: The difficult part
                At this point, the chunk we're at already has a successor.
@@ -187,66 +143,71 @@ function TranscriberController($interval, $scope, alt1) {
             var newChunk;
             if (read.title && read.text && !read.opts) {
                 // Speech type
-                if (     $scope.chunk.type === 'speech'
+                if (     $scope.chunk
+                      && $scope.chunk.type === 'speech'
                       && read.title === $scope.chunk.originalTitle
                    ) {
                     // Concatenate to existing chunk
-                    $scope.chunk.push({text: read.text, originalText: read.text});
-                    
+                    $scope.chunk.addText(read.text);
                     return;
                 } else {
-                    newChunk = new ChunkBuilder('speech')
-                        .text(read.text)
-                        .title(read.title)
-                        .build();
+                    newChunk = new LinkedChunk('speech')
+                        .addText(read.text)
+                        .setTitle(read.title);
                     // Fall through to chunk insertion
                 }
             } else if (read.title && !read.text && read.opts) {
                 // Choice type
                 // Never merge
-                var builder = new ChunkBuilder('choice')
-                    .title('read.title')
+                newChunk = new LinkedChunk('choice')
+                    .setTitle('read.title');
                 for (var i = 0; i < read.opts.length; ++i) {
-                    builder.option(read.opts[i]);
+                    newChunk.addOption(read.opts[i]);
                 }
-                newChunk = builder.build();
                 // Fall through to chunk insertion
             } else if (!read.title && read.text && !read.opts) {
                 // Message type
-                if ($scope.chunk.type === 'message') {
-                    $scope.chunk.push({text: read.text, originalText: read.text});
+                if (    $scope.chunk
+                     && $scope.chunk.type === 'message'
+                   ) {
+                    $scope.chunk.addText(read.text);
                     return;
                 } else {
-                    newChunk = new ChunkBuilder('message')
-                        .text(read.text)
-                        .build();
+                    newChunk = new LinkedChunk('message')
+                        .addText(read.text);
                     // Fall through to chunk insertion
                 }
                     
             } else throw Error('Could not make sense of read', read);
             
-            
-        }
-        
-        var newChonk = new Chunk(read);
-        
-        // TODO: Automatic merge with various eagerness levels
-        if ($scope.currentChonk.options) {
-            // TODO: Handle options
-        } else {
-            // TODO: Ask for permission rather than forgiveness?
-            try {
-                $scope.currentChonk.concat(newChonk);
-            } catch (ex) {
-                console.log(ex);
-                $scope.chunks.push(newChonk);
-                $scope.currentChonk = newChonk;
+            if (!newChunk) throw Error('New chunk was somehow not initialised from the following read', read);
+            if (!$scope.rootChunk) {
+                // After launching the app, or clearing the tree
+                $scope.rootChunk = $scope.chunk = newChunk;
+                return;
+            } else if (!$scope.chunk) {
+                /*
+                 * If we somehow get here, we have no idea where
+                 *  in the tree we are. Continuing at this point isn't
+                 *  reasonable and would probably break things. So we won't.
+                 * The idea is for this to be unreachable, however.
+                 */
+                throw Error('We somehow got lost');
+            } else if (!$scope.chunk.next) {
+                    $scope.chunk.next = newChunk;
+                    newChunk.prev = $scope.chunk.next;
+                    $scope.chunk = newChunk;
+            } else {
+                throw Error('Conflict resolution not implemented yet');
             }
+            // TODO: Insert chunk in a sensible manner
         }
+        
     };
     
     // Maybe remove and wait for it to return
     $scope.interval = $interval($scope.updateModel, 400);
+
 }
 
 

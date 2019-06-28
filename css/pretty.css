@@ -57,3 +57,11 @@
 .pretty .question {
     font-weight: bold;
 }
+
+.pretty .identifier * {
+    display: none;
+}
+
+.pretty .identifier:hover * {
+    display: inline;
+}
