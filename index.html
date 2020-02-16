@@ -31,7 +31,7 @@
     <link rel="icon" href="favicon2.ico" type="image/x-icon" />
 </head>
 <body ng-app="rs-wiki-transcriber" ng-controller="transcriber">
-    <strong class="warning" id="no-alt1" ng-if="!('alt1' in window)">Alt1 does not appear to be running.</strong>
+    <strong class="warning" id="no-alt1" ng-if="alt1 === undefined">Alt1 does not appear to be running - this app will not work without it.</strong>
     <script type="text/javascript" src="js/debugChunks.js"></script>
     <input type="checkbox" ng-model="showAsCode" />
     
